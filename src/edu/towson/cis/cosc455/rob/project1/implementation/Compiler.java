@@ -1,26 +1,34 @@
 package edu.towson.cis.cosc455.rob.project1.implementation;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Compiler {
 
-	//definitions for file types
+	//definition for markdown extension
 	static String markdownExtension = "mkd";
 	
 	//definitions for error messages
 	static String invalidExtensionError = "Invalid extension error. File extension must be of type .mkd.";
+	static String invalidTokenError = " is an Invalid Token.";
 	
 	//variables
-	static boolean verboseOutput = false;
+	public static boolean endOfFile = false;
+	
 	public static String contentsOfMarkdownFile = "";
 	
-	//
-	BufferedReader reader;
+	//token bin!!!!
+	public static ArrayList<Token> tokenBin;
+	
+	Scanner reader;
 	
 	public static String currentToken = "";
+	
+	//Compiler Components
+	public static LexicalAnalyzer lex;
 	
 	public static void main(String[] args) throws CompilerException, FileNotFoundException,IOException {
 		// TODO Auto-generated method stub
@@ -30,21 +38,33 @@ public class Compiler {
 		
 		contentsOfMarkdownFile = openMKDFile(args[0]);
 		
+		 lex = new LexicalAnalyzer(contentsOfMarkdownFile);
+		
+		while(!endOfFile){
+			lex.getNextToken();
+			if(lex.isUnrecognizedToken()){
+				throw new CompilerException(lex.getLexeme() + invalidTokenError);
+			}
+			else System.out.println(lex.currenttoken.toString());
+			
+		}
+		System.out.println("Compiler end of file");
 	}
 	
 	public static boolean verifyExtensionType(String fileName, String extensionType){
 		return(fileName.endsWith('.'+ extensionType));
 	}
 	
-	static String openMKDFile(String fileName) throws FileNotFoundException, IOException{
+	public static String openMKDFile(String fileName) throws FileNotFoundException, IOException{
 		
 		String contentsOfMarkdownFile = "";
-		BufferedReader reader;
+		Scanner reader;
 		
 		try{
-			reader = new BufferedReader(new FileReader(fileName));
-			while(reader.readLine()!=null){
-				contentsOfMarkdownFile += reader.readLine();
+			reader = new Scanner(new FileReader(fileName));
+			
+			while(reader.hasNextLine()){
+				contentsOfMarkdownFile += reader.nextLine();
 			}
 			reader.close();
 		}
@@ -57,5 +77,14 @@ public class Compiler {
 		
 		return contentsOfMarkdownFile;
 	}
+
+	public static boolean isEndOfFile() {
+		return endOfFile;
+	}
+
+	public static void setEndOfFile(boolean endOfFile) {
+		Compiler.endOfFile = endOfFile;
+	}
+	
 
 }

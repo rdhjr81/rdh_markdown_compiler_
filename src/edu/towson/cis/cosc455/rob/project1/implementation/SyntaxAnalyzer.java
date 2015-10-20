@@ -1,16 +1,13 @@
 package edu.towson.cis.cosc455.rob.project1.implementation;
 
+
+
 public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.interfaces.SyntaxAnalyzer {
 	
 	
 	@Override
 	public void markdown() throws CompilerException {
-		if(Compiler.currentToken.equalsIgnoreCase(Tokens.DOCB)){
-			
-		}
-		else{
-			//do error stuffs
-		}
+		
 	}
 
 	@Override
