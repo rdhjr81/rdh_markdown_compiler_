@@ -17,7 +17,7 @@ public class Compiler {
 	
 	//variables
 	public static boolean endOfFile = false;
-	
+	public static Token currentToken = null;
 	public static String contentsOfMarkdownFile = "";
 	
 	//token bin!!!!
@@ -25,10 +25,9 @@ public class Compiler {
 	
 	Scanner reader;
 	
-	public static String currentToken = "";
-	
 	//Compiler Components
 	public static LexicalAnalyzer lex;
+	public static SyntaxAnalyzer syn;
 	
 	public static void main(String[] args) throws CompilerException, FileNotFoundException,IOException {
 		// TODO Auto-generated method stub
@@ -38,7 +37,10 @@ public class Compiler {
 		
 		contentsOfMarkdownFile = openMKDFile(args[0]);
 		
-		 lex = new LexicalAnalyzer(contentsOfMarkdownFile);
+		lex = new LexicalAnalyzer(contentsOfMarkdownFile);
+		
+		syn = new SyntaxAnalyzer();
+		
 		
 		while(!endOfFile){
 			lex.getNextToken();
@@ -85,6 +87,17 @@ public class Compiler {
 	public static void setEndOfFile(boolean endOfFile) {
 		Compiler.endOfFile = endOfFile;
 	}
+	public static void addCurrentTokenToTokenBin() {
+		tokenBin.add(lex.currenttoken);
+	}
+	public static void getNextTokenFromLex() {
+		lex.getNextToken();
+	}
+	public static void getNextTokenFromLexAndAddTokenBin(){
+		getNextTokenFromLex();
+		tokenBin.add(lex.currenttoken);
+	}
+	
 	
 
 }
