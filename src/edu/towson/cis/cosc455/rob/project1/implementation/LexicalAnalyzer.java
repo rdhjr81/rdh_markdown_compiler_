@@ -90,95 +90,99 @@ public class LexicalAnalyzer implements edu.towson.cis.cosc455.rob.project1.inte
    	 */
 	public void getNextToken(){
 		//at start of file no character exists in 'nextCharacter' so initialize it to first character
-				if(currentPosition == 0){	
-					getCharacter();
-					
-					//test
-					System.out.println("-initialized. first Char is " + nextCharacter + " - Index of Compiler is " + currentPosition);
-					
-					
-				}
+		String alternativeLexeme = "";
+			
+		if(currentPosition == 0){	
+			getCharacter();
+			
+			//test
+			System.out.println("-initialized. first Char is " + nextCharacter + " - Index of Compiler is " + currentPosition);
+			
+			
+		}
+		
+		if(currentPosition == sourceFile.length()){
+			Compiler.setEndOfFile(true);
+		}
+		
+		
+		if(isSpace(nextCharacter)){
+			
+			//test
+			//System.out.println("Char is " + nextCharacter + " - Index of Compiler is " + currentPosition);
+			System.out.println("\t Test for WhiteSpace: lexeme=" + lexeme + " nextCharacter=" +nextCharacter);
+			
+			addCharacter();
+			getCharacter();
+			while(isSpace(nextCharacter) && !endOfFile()){ //continue capturing whitespace characters
 				
+				System.out.println("\t Test for WhiteSpace: lexeme=" + lexeme + " nextCharacter=" +nextCharacter);
 				
-				if(isSpace(nextCharacter)){
-					
-					//test
-					//System.out.println("Char is " + nextCharacter + " - Index of Compiler is " + currentPosition);
-					System.out.println("\t Test for WhiteSpace: lexeme=" + lexeme + " nextCharacter=" +nextCharacter);
-					
-					addCharacter();
-					getCharacter();
-					while(isSpace(nextCharacter)){ //continue capturing whitespace characters
-						
-						System.out.println("\t Test for WhiteSpace: lexeme=" + lexeme + " nextCharacter=" +nextCharacter);
-						
-						addCharacter();
-						getCharacter();
-					}
-					//we have a whitespace token
-					currenttoken = new Token(Type.WHITESPACE, lexeme);
-					
-					
-				}
-				else if(isWord(nextCharacter) || isNonWord(nextCharacter)){
-					
-					System.out.println("\t Test for Word: lexeme=" + lexeme + " nextCharacter=" +nextCharacter);
-					
-					addCharacter();
-					getCharacter();
-					while(isWord(nextCharacter) || isNonWord(nextCharacter)){ //continue capturing word and non-word characters
-						System.out.println("\t Test for Word: lexeme=" + lexeme + " nextCharacter=" +nextCharacter);
-						addCharacter();
-						getCharacter();
-					}
-					//we have a text token
-					currenttoken = new Token(Type.TEXT, lexeme);
-					
-				}
+				addCharacter();
+				getCharacter();
 				
-				else{//nextChar is not empty, lexeme is empty
-					
-					
-					
-					if(!lookupToken()){ //lexeme is not 1 symbol long, continue adding chars for multiple character reserved words
-						
-						System.out.println("3rd else of getNextToken: lexeme=" + lexeme + " nextCharacter="+nextCharacter);
-
-						addCharacter();
-						getCharacter();
-						if(!lookupToken()){
-							while(isWord(nextCharacter) || isNonWord(nextCharacter)){ //continue capturing non whitespace characters
-								if(currentPosition < sourceFile.length()){
-									System.out.println("3rd else (while loop) of getNextToken: lexeme=" + lexeme + " nextCharacter=" +nextCharacter);
-									
-									addCharacter();
-									getCharacter();
-								}
-								else{
-									addCharacter();
-									break;
-								}
-								
-							}
-						}
-						if(!lookupToken()){
-							System.out.println("3rd else (while loop) of getNextToken: lexeme=" + lexeme + " IS UNRECOGNIZED nextCharacter="+nextCharacter);
-							System.out.println("***Setting unrecognized token to TRUE***");
-							unrecognizedToken = true;
-						}
-					}	
-				}
-				
-				//reset variable 'lexeme' to blank
-				
-				if(!unrecognizedToken){
-					lexeme = new String();
-					//getCharacter();
-					System.out.println("resetting variable \"lexeme\" to blank");
-				}
 				if(currentPosition == sourceFile.length()){
 					Compiler.setEndOfFile(true);
 				}
+			}
+			//we have a whitespace token
+			currenttoken = new Token(Type.WHITESPACE, lexeme);
+			
+			
+		}
+		else if(isWord(nextCharacter) || isNonWord(nextCharacter)){
+			
+			System.out.println("\t Test for Word: lexeme=" + lexeme + " nextCharacter=" +nextCharacter);
+			
+			addCharacter();
+			getCharacter();
+			while(isWord(nextCharacter) || isNonWord(nextCharacter)){ //continue capturing word and non-word characters
+				System.out.println("\t Test for Word: lexeme=" + lexeme + " nextCharacter=" +nextCharacter);
+				addCharacter();
+				getCharacter();
+			}
+			//we have a text token
+			currenttoken = new Token(Type.TEXT, lexeme);
+			
+		}
+		else{//not a letter or whitespace, must be a reserved symbol OR the start of a reserved symbol
+			addCharacter();	//add current character to lexeme string
+			getCharacter(); //get next character and place it in nextCharacter
+			if(isSpace(nextCharacter)){
+				System.out.println("getNextToken Single Reserved Character followed by Space: lexeme=" + lexeme + " nextCharacter=" +nextCharacter);
+			}
+			else if(isWord(nextCharacter)){	//how to handle #BEGIN and [http]
+				
+				alternativeLexeme = lexeme; //store candidate 
+				if(!lookupToken()){
+					while(isWord(nextCharacter) && currentPosition < sourceFile.length()){
+						System.out.println("getNextToken Single Reserved Character followed by Letter: lexeme=" + lexeme + " nextCharacter=" +nextCharacter);
+						addCharacter();
+						getCharacter();
+					}
+				}
+				
+			}
+			else{
+				if(!lookupToken()){
+					while(!(isWord(nextCharacter) || isSpace(nextCharacter))){
+						addCharacter();
+						getCharacter();
+					}
+				}
+			}
+			
+			if(!lookupToken()){
+				System.out.println("3rd else (while loop) of getNextToken: lexeme=" + lexeme + " IS UNRECOGNIZED nextCharacter="+nextCharacter);
+				System.out.println("***Setting unrecognized token to TRUE***");
+				unrecognizedToken = true;
+			}
+		}
+		
+		//reset variable 'lexeme' to blank
+		lexeme = "";
+		
+		
 	}
 	
 	/**
@@ -279,6 +283,10 @@ public class LexicalAnalyzer implements edu.towson.cis.cosc455.rob.project1.inte
 
 	public String getLexeme() {
 		return lexeme;
+	}
+	
+	public boolean endOfFile() {		
+		return currentPosition >= sourceFile.length();
 	}
 }
 	
