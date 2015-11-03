@@ -233,22 +233,22 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 					lex.currenttoken.tokenType == Type.WHITESPACE){
 				
 			
-				if(lex.currenttoken.tokenType != Type.LISTITEMB){
+				if(lex.currenttoken.tokenType == Type.LISTITEMB){
 					listitem();
 				}
-				else if(lex.currenttoken.tokenType != Type.LINKB){
+				else if(lex.currenttoken.tokenType == Type.LINKB){
 					link();
 				}
-				else if(lex.currenttoken.tokenType != Type.AUDIO){
+				else if(lex.currenttoken.tokenType == Type.AUDIO){
 					audio();
 				}
-				else if(lex.currenttoken.tokenType != Type.VIDEO){
+				else if(lex.currenttoken.tokenType == Type.VIDEO){
 					video();
 				}
-				else if(lex.currenttoken.tokenType != Type.USEB){
+				else if(lex.currenttoken.tokenType == Type.USEB){
 					variableUse();
 				}
-				else if(lex.currenttoken.tokenType != Type.NEWLINE){
+				else if(lex.currenttoken.tokenType == Type.NEWLINE){
 					newline();
 				}
 				else if(lex.currenttoken.tokenType == Type.BOLD){

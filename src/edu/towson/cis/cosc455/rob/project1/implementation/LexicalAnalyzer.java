@@ -174,7 +174,11 @@ public class LexicalAnalyzer implements edu.towson.cis.cosc455.rob.project1.inte
 				
 			}
 			else{
+				addCharacter();
+				getCharacter();
+				if(verboseOutput)System.out.println("getNextToken initial lexeme: " + lexeme);
 				if(!lookupToken()){
+					if(verboseOutput)System.out.println("getNextToken 2nd lexeme: " + lexeme);
 					while(!(isWord(nextCharacter) || isSpace(nextCharacter))){
 						addCharacter();
 						getCharacter();
