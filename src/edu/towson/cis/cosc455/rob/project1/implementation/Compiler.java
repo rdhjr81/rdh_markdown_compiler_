@@ -17,8 +17,10 @@ public class Compiler {
 	
 	//variables
 	public static boolean endOfFile = false;
+	public static boolean verboseOutput = true;
 	public static Token currentToken = null;
 	public static String contentsOfMarkdownFile = "";
+	public static String markdownFileName;
 	
 	//token bin!!!!
 	public static ArrayList<Token> tokenBin;
@@ -28,6 +30,7 @@ public class Compiler {
 	//Compiler Components
 	public static LexicalAnalyzer lex;
 	public static SyntaxAnalyzer syn;
+	public static SemanticAnalyzer sem;
 	
 	public static void main(String[] args) throws CompilerException, FileNotFoundException,IOException {
 		// TODO Auto-generated method stub
@@ -35,20 +38,38 @@ public class Compiler {
 			throw new CompilerException(invalidExtensionError);
 		}
 		
+		markdownFileName = getFileNameOfMarkdownFile(args[0]);
+		
+		System.out.println("File name is " + markdownFileName);
+		
 		contentsOfMarkdownFile = openMKDFile(args[0]);
+		
+		tokenBin = new ArrayList<Token>();
 		
 		lex = new LexicalAnalyzer(contentsOfMarkdownFile);
 		
 		syn = new SyntaxAnalyzer();
 		
+		sem = new SemanticAnalyzer();
 		
-		while(!endOfFile){
+		syn.markdown();
+		
+		
+		/*while(!endOfFile){
 			lex.getNextToken();
 			if(lex.isUnrecognizedToken()){
 				throw new CompilerException(lex.getLexeme() + invalidTokenError);
 			}
-			else System.out.println(lex.currenttoken.toString());
+			else if(verboseOutput) System.out.println(lex.currenttoken.toString());
 			
+		}*/
+		
+		if(verboseOutput){
+			//print token stream out
+			for(Token x : tokenBin){
+				
+				System.out.print(x.tokenType + ": " + x.content+ " ");
+			}
 		}
 		System.out.println("Compiler end of file");
 	}
@@ -96,6 +117,12 @@ public class Compiler {
 	public static void getNextTokenFromLexAndAddTokenBin(){
 		getNextTokenFromLex();
 		tokenBin.add(lex.currenttoken);
+	}
+	
+	public static String getFileNameOfMarkdownFile(String s){
+		 return s.substring(
+				 Math.max(s.lastIndexOf('\\'), s.lastIndexOf('/')) + 1, 
+				 s.lastIndexOf('.'));
 	}
 	
 	

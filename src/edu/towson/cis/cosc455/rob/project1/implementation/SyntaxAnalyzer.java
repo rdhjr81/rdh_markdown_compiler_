@@ -21,6 +21,7 @@ import MarkdownTokenDefinitions.TokenDefinitions.Type;
 public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.interfaces.SyntaxAnalyzer {
 	
 	public boolean syntaxError;
+	public boolean verboseOutput;
 	public Token currentToken;
 	public LexicalAnalyzer lex;
 	public TokenDefinitions def;
@@ -33,10 +34,12 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 		// TODO Auto-generated constructor stub
 		syntaxError = false;
 		
+		verboseOutput = Compiler.verboseOutput;
+		
 		syntaxErrorMessage = "Syntax Error";
 		
-		
 		lex = Compiler.lex;
+		
 		lex.getNextToken();
 		
 		
@@ -75,12 +78,38 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 			}
 		}
 	}
+	@Override
+	public void bold() throws CompilerException {
+		// TODO Auto-generated method stub
+		//boldtext	: BOLD TEXT+ BOLD  ;
+		
+		if(!syntaxError){
+			lex.getNextToken();
+			if(lex.currenttoken.tokenType == Type.TEXT ||
+				lex.currenttoken.tokenType == Type.WHITESPACE){
+				textOrWhitespaceMultipleTimes();
+			}
+			else{
+					setErrorFlag();
+					throw new CompilerException(getSyntaxErrorMessage(Type.TEXT));
+				}
+			
+			if(lex.currenttoken.tokenType == Type.BOLD){
+					lex.getNextToken();
+			}
+			else{
+				setErrorFlag();
+				throw new CompilerException(getSyntaxErrorMessage(Type.BOLD));
+			}
+		}
+	}
 	//code		: vardef head? body ;
 	public void code() throws CompilerException {
 		if(!syntaxError){
 			
-			
+			whiteSpace();
 			variableDefine();
+			whiteSpace();
 			head();
 			body();
 		}
@@ -95,7 +124,7 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 				lex.getNextToken();
 				whiteSpace();
 				title();
-				
+				whiteSpace();
 				if(lex.currenttoken.tokenType == Type.HEAD){
 					lex.getNextToken();
 				}
@@ -187,7 +216,10 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 		// TODO Auto-generated method stub
 		//paragraph	:  PARAB vardef? (link | listitem| audio | video|  varuse|  (NEWLINE)| TEXT)* PARAE ;
 		if(!syntaxError){
+			lex.getNextToken();
+			whiteSpace();
 			variableDefine(); 
+			whiteSpace();
 		
 			while(	lex.currenttoken.tokenType == Type.LISTITEMB ||
 					lex.currenttoken.tokenType == Type.LINKB ||
@@ -226,6 +258,7 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 					italics();
 				}
 				else{
+					if(verboseOutput)System.out.println("para(): whitespace or text");
 					textOrWhitespaceMultipleTimes();
 				}
 			}
@@ -274,6 +307,7 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 		//vardef		: (DEFB TEXT EQSIGN TEXT DEFUSEE)* ;
 		if(!syntaxError){
 			if(lex.currenttoken.tokenType == Type.DEFB){
+				if(verboseOutput)System.out.println("DEFB found");
 				while(lex.currenttoken.tokenType == Type.DEFB){
 			
 					lex.getNextToken();
@@ -309,11 +343,14 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 		}
 	}
 	
+
+
 	@Override
 	public void variableUse() throws CompilerException {
 		// TODO Auto-generated method stub
 		//varuse		: USEB TEXT+ DEFUSEE ;
 		if(!syntaxError){
+			lex.getNextToken();
 			if(lex.currenttoken.tokenType == Type.TEXT ||
 				lex.currenttoken.tokenType == Type.WHITESPACE){
 				textOrWhitespaceMultipleTimes();
@@ -328,37 +365,14 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 			}
 		}
 		
-
+	
 	}
-
-	@Override
-	public void bold() throws CompilerException {
-		// TODO Auto-generated method stub
-		//boldtext	: BOLD TEXT+ BOLD  ;
-		if(!syntaxError){
-			if(lex.currenttoken.tokenType == Type.TEXT ||
-				lex.currenttoken.tokenType == Type.WHITESPACE){
-				textOrWhitespaceMultipleTimes();
-			}
-			else{
-					setErrorFlag();
-					throw new CompilerException(getSyntaxErrorMessage(Type.TEXT));
-				}
-			
-			if(lex.currenttoken.tokenType == Type.BOLD){
-					lex.getNextToken();
-			}
-			else{
-				setErrorFlag();
-				throw new CompilerException(getSyntaxErrorMessage(Type.BOLD));
-			}
-		}
-	}
-
 	@Override
 	public void italics() throws CompilerException {
 		// TODO Auto-generated method stub
+		
 		if(!syntaxError){
+			lex.getNextToken();
 			if(lex.currenttoken.tokenType == Type.TEXT ||
 				lex.currenttoken.tokenType == Type.WHITESPACE){
 				textOrWhitespaceMultipleTimes();
@@ -384,6 +398,7 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 	public void listitem() throws CompilerException {
 		// TODO Auto-generated method stub
 		if(!syntaxError){
+			lex.getNextToken();
 			if(lex.currenttoken.tokenType == Type.TEXT ||
 				lex.currenttoken.tokenType == Type.WHITESPACE ||
 				lex.currenttoken.tokenType == Type.USEB) {
@@ -447,31 +462,85 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 	@Override
 	public void link() throws CompilerException {
 		// TODO Auto-generated method stub
-
+		if(!syntaxError){
+			lex.getNextToken();
+			if(lex.currenttoken.tokenType == Type.TEXT ||
+					lex.currenttoken.tokenType == Type.WHITESPACE){
+				textOrWhitespaceMultipleTimes();
+			}
+			else{
+				setErrorFlag();
+				throw new CompilerException(getSyntaxErrorMessage(Type.TEXT));
+			}
+			if(lex.currenttoken.tokenType == Type.LINKE){
+				lex.getNextToken();
+				
+			}
+			else{
+				setErrorFlag();
+				throw new CompilerException(getSyntaxErrorMessage(Type.LINKE));
+			}
+			address();
+			
+		}
 	}
-
+	public void address() throws CompilerException {
+		// TODO Auto-generated method stub
+		if(lex.currenttoken.tokenType == Type.ADDRESSB){
+			lex.getNextToken();
+			
+		}
+		else{
+			setErrorFlag();
+			throw new CompilerException(getSyntaxErrorMessage(Type.ADDRESSB));
+		}
+		if(lex.currenttoken.tokenType == Type.TEXT ||
+				lex.currenttoken.tokenType == Type.WHITESPACE){
+			textOrWhitespaceMultipleTimes();
+		}
+		else{
+			setErrorFlag();
+			throw new CompilerException(getSyntaxErrorMessage(Type.TEXT));
+		}
+		if(lex.currenttoken.tokenType == Type.ADDRESSE){
+			lex.getNextToken();
+			
+		}
+		else{
+			setErrorFlag();
+			throw new CompilerException(getSyntaxErrorMessage(Type.ADDRESSE));
+		}
+	}
 	@Override
 	public void audio() throws CompilerException {
 		// TODO Auto-generated method stub
-
+		lex.getNextToken();
+		address();
 	}
 
 	@Override
 	public void video() throws CompilerException {
 		// TODO Auto-generated method stub
+		lex.getNextToken();
+		address();
 
 	}
 
 	@Override
 	public void newline() throws CompilerException {
 		// TODO Auto-generated method stub
-
+		lex.getNextToken();
 	}
 	
 	public String getSyntaxErrorMessage(Type missingToken){
+		int errorPosition = lex.currentPosition;
+		String errorPositionIndicator = "";
+		
+		String errorArea = lex.sourceFile.substring(errorPosition - 30, errorPosition + 30) ;
+		
 		String errorMessage = "Syntax Error - " + missingToken.toString() + " was expected and not found.";
 		
-		return errorMessage;
+		return "\n" + errorArea + "\n" + errorMessage;
 	}
 	
 	public void setErrorFlag(){
