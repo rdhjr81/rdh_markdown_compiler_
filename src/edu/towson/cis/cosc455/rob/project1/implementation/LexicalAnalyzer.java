@@ -92,10 +92,8 @@ public class LexicalAnalyzer implements edu.towson.cis.cosc455.rob.project1.inte
    	 * token to be parsed.
    	 * @throws CompilerException 
    	 */
-	public void getNextToken(){
+	public void getNextToken() throws CompilerException{
 		//at start of file no character exists in 'nextCharacter' so initialize it to first character
-		String alternativeLexeme = "";
-		
 		unrecognizedToken = true;
 		
 		if(currentPosition == 0){	
@@ -156,34 +154,40 @@ public class LexicalAnalyzer implements edu.towson.cis.cosc455.rob.project1.inte
 			tokenBin.add(currenttoken);
 		}
 		else{//not a letter or whitespace, must be a reserved symbol OR the start of a reserved symbol
+			
 			addCharacter();	//add current character to lexeme string
 			getCharacter(); //get next character and place it in nextCharacter
+			
 			if(isSpace(nextCharacter)){
 				if(verboseOutput)System.out.println("getNextToken Single Reserved Character followed by Space: lexeme=" + lexeme + " nextCharacter=" +nextCharacter);
+				if(!lookupToken()){
+					unrecognizedToken = true;
+				}
 			}
 			else if(isWord(nextCharacter)){	//how to handle #BEGIN and [http]
 				
-				alternativeLexeme = lexeme; //store candidate 
 				if(!lookupToken()){
 					while(isWord(nextCharacter) && currentPosition < sourceFile.length()){
 						if(verboseOutput)System.out.println("getNextToken Single Reserved Character followed by Letter: lexeme=" + lexeme + " nextCharacter=" +nextCharacter);
 						addCharacter();
 						getCharacter();
 					}
+					if(!lookupToken()){
+						unrecognizedToken = true;
+					}
 				}
 				
 			}
-			else{
-				addCharacter();
-				getCharacter();
-				if(verboseOutput)System.out.println("getNextToken initial lexeme: " + lexeme);
-				if(!lookupToken()){
-					if(verboseOutput)System.out.println("getNextToken 2nd lexeme: " + lexeme);
-					while(!(isWord(nextCharacter) || isSpace(nextCharacter))){
-						addCharacter();
-						getCharacter();
-					}
+			else{//could be 1 single sign '*' or '**' or '*@'
+				
+				if(nextCharacter.equals(lexeme.substring(0, 1))){
+					addCharacter();
+					getCharacter();
+					if(lookupToken()) unrecognizedToken = false;
+					
 				}
+				else if(lookupToken()) unrecognizedToken = false;
+
 			}
 			
 			if(unrecognizedToken){
@@ -192,6 +196,7 @@ public class LexicalAnalyzer implements edu.towson.cis.cosc455.rob.project1.inte
 					if(verboseOutput)System.out.println("***Setting unrecognized token to TRUE***");
 					
 				}
+				throw new CompilerException(getLexicalErrorMessage(lexeme));
 			}
 		}
 		
@@ -309,6 +314,20 @@ public class LexicalAnalyzer implements edu.towson.cis.cosc455.rob.project1.inte
 	
 	public boolean endOfFile() {		
 		return currentPosition >= sourceFile.length();
+	}
+	
+	public String getLexicalErrorMessage(String erroneousToken){
+		int errorPosition = currentPosition;
+		
+		String errorPositionIndicator = "";
+		
+		String errorArea = sourceFile.substring(errorPosition - 30 < 0 ? 0 : errorPosition - 30, errorPosition + 30) ;
+		
+		String errorMessage = "Lexical Error - " + lexeme + " is not a valid word.";
+		
+		
+		
+		return "\n" + errorArea + "\n" + errorMessage;
 	}
 }
 	

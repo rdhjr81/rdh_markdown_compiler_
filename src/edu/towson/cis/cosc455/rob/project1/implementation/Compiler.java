@@ -1,15 +1,23 @@
 package edu.towson.cis.cosc455.rob.project1.implementation;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import MarkdownTokenDefinitions.HtmlDefinitions;
+import MarkdownTokenDefinitions.MarkdownBlocks;
+import MarkdownTokenDefinitions.TokenDefinitions;
+
 public class Compiler {
 
 	//definition for markdown extension
-	static String markdownExtension = "mkd";
+	static String markdownExtension = TokenDefinitions.MARKDOWN_FILE_EXTENSION;
+	static String htmlExtension = HtmlDefinitions.HTML_EXTENSION;
 	
 	//definitions for error messages
 	static String invalidExtensionError = "Invalid extension error. File extension must be of type .mkd.";
@@ -17,10 +25,10 @@ public class Compiler {
 	
 	//variables
 	public static boolean endOfFile = false;
-	public static boolean verboseOutput = true;
+	public static boolean verboseOutput = false;
 	public static Token currentToken = null;
-	public static String contentsOfMarkdownFile = "";
-	public static String markdownFileName;
+	public static String contentsOfMarkdownFile = "", markdownFileName = "", markdownFileLocation = "";
+	public static String htmlFile = "";
 	
 	//token bin!!!!
 	public static ArrayList<Token> tokenBin;
@@ -40,7 +48,15 @@ public class Compiler {
 		
 		markdownFileName = getFileNameOfMarkdownFile(args[0]);
 		
-		System.out.println("File name is " + markdownFileName);
+		if(verboseOutput){
+			System.out.println("File name is " + markdownFileName);
+		}
+		
+		markdownFileLocation = getFileLocationOfMarkdownFile(args[0]);
+		
+		if(verboseOutput){
+			System.out.println("File location is " + markdownFileLocation);
+		}
 		
 		contentsOfMarkdownFile = openMKDFile(args[0]);
 		
@@ -54,6 +70,11 @@ public class Compiler {
 		
 		syn.markdown();
 		
+		if(verboseOutput){
+			System.out.println("syntax Analysis complete, starting semantic analyzer");
+		}
+		
+		sem.resolveVariables();
 		
 		/*while(!endOfFile){
 			lex.getNextToken();
@@ -68,13 +89,54 @@ public class Compiler {
 			//print token stream out
 			for(Token x : tokenBin){
 				
-				System.out.print(x.tokenType + ": " + x.content+ " ");
+				System.out.print( x.content);
 			}
 		}
-		System.out.println("Compiler end of file");
+		
+		htmlFile = sem.translateToHtml();
+		if(verboseOutput){
+			System.out.println(htmlFile);
+			
+		}
+		htmlFile = writeHtmlToFile();
+		
+		openHTMLFileInBrowswer(htmlFile);
+		
+		if(verboseOutput){
+			System.out.println("Compiler end of file");
+		}
 	}
 	
+	private static String writeHtmlToFile() {
+		String pathname = markdownFileLocation + markdownFileName + "." + htmlExtension;
+		try {
+			FileWriter out = new FileWriter(new File(pathname));
+			out.write(htmlFile);
+			out.close();
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return pathname;
+		
+	}
+
+	private static String getFileLocationOfMarkdownFile(String s) {
+		if(s.contains("/") || s.contains("\\")){
+			return s.substring(0, Math.max(s.lastIndexOf('\\'), s.lastIndexOf('/')) + 1);
+		}
+		else return "./";
+	}
+
 	public static boolean verifyExtensionType(String fileName, String extensionType){
+		
+		
+		if(verboseOutput){
+			System.out.println("Filename: " + fileName);
+			System.out.println("Extension type: " + extensionType);
+		}
 		return(fileName.endsWith('.'+ extensionType));
 	}
 	
@@ -111,10 +173,10 @@ public class Compiler {
 	public static void addCurrentTokenToTokenBin() {
 		tokenBin.add(lex.currenttoken);
 	}
-	public static void getNextTokenFromLex() {
+	public static void getNextTokenFromLex() throws CompilerException {
 		lex.getNextToken();
 	}
-	public static void getNextTokenFromLexAndAddTokenBin(){
+	public static void getNextTokenFromLexAndAddTokenBin() throws CompilerException{
 		getNextTokenFromLex();
 		tokenBin.add(lex.currenttoken);
 	}
@@ -123,6 +185,22 @@ public class Compiler {
 		 return s.substring(
 				 Math.max(s.lastIndexOf('\\'), s.lastIndexOf('/')) + 1, 
 				 s.lastIndexOf('.'));
+	}
+	
+	public static void openHTMLFileInBrowswer(String htmlFileStr){
+		File file= new File(htmlFileStr.trim());
+		if(!file.exists()){
+			System.err.println("File "+ htmlFileStr +" does not exist.");
+			return;
+		}
+		try{
+			Desktop.getDesktop().browse(file.toURI());
+		}
+		catch(IOException ioe){
+			System.err.println("Failed to open file");
+			ioe.printStackTrace();
+		}
+		return ;
 	}
 	
 	

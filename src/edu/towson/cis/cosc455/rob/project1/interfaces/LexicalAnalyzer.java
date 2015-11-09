@@ -1,5 +1,7 @@
 package edu.towson.cis.cosc455.rob.project1.interfaces;
 
+import edu.towson.cis.cosc455.rob.project1.implementation.CompilerException;
+
 /**
  * COSC 455 Programming Languages: Implementation and Design.
  *
@@ -22,8 +24,9 @@ package edu.towson.cis.cosc455.rob.project1.interfaces;
 	/**
 	 * This is the public method to be called when the Syntax Analyzer needs a new
 	 * token to be parsed.
+	 * @throws CompilerException 
 	 */
-	public void getNextToken();
+	public void getNextToken() throws CompilerException;
 
 	/**
 	 * This is method gets the next character from the input and places it in

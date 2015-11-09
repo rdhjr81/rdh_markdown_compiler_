@@ -4,6 +4,8 @@ import java.util.HashMap;
 
 public class TokenDefinitions {
 	
+	public static final String MARKDOWN_FILE_EXTENSION= "mkd";
+	
 	public static final String DOCB = "#BEGIN";
 	public static final String DOCE	= "#END" ;
 	public static final String HEAD	= "^" ;

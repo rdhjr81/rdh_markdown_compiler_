@@ -1,7 +1,9 @@
 package MarkdownTokenDefinitions;
 
 public class HtmlDefinitions {
-
+	
+	public static final String HTML_EXTENSION= "html";
+	
 	public static final String HTML_DOC= "html";
 
 	public static final String HTML_HEAD	= "head" ;
@@ -30,7 +32,15 @@ public class HtmlDefinitions {
 	
 	public static final String HTML_VIDEO		= "iframe" ;
 	
-	public static final String HTML_SOURCE 		= "src";
+	public static final String HTML_SRC 		= "src";
 	
+	public static final String HTML_SOURCE		= "source";
+	
+	
+	public static final String HTML_BRACKET_L = "<";
+	
+	public static final String HTML_BRACKET_R = ">";
+	
+	public static final String HTML_BRACKET_CLOSE = "/";
 
 }

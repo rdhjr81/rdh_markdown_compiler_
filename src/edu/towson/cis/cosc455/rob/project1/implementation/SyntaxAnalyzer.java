@@ -30,7 +30,7 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 	
 	
 	
-	public SyntaxAnalyzer() {
+	public SyntaxAnalyzer() throws CompilerException {
 		// TODO Auto-generated constructor stub
 		syntaxError = false;
 		
@@ -135,7 +135,7 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 			}
 		}
 	}
-	public void textOrWhitespaceMultipleTimes(){
+	public void textOrWhitespaceMultipleTimes() throws CompilerException{
 		while(lex.currenttoken.tokenType == Type.TEXT || 
 				lex.currenttoken.tokenType == Type.WHITESPACE){
 			lex.getNextToken();
@@ -249,6 +249,7 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 					variableUse();
 				}
 				else if(lex.currenttoken.tokenType == Type.NEWLINE){
+					if(verboseOutput)System.out.println("para(): n");
 					newline();
 				}
 				else if(lex.currenttoken.tokenType == Type.BOLD){
@@ -332,6 +333,7 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 					if(!syntaxError){
 						if(lex.currenttoken.tokenType == Type.DEFUSEE) {
 							lex.getNextToken();
+							whiteSpace();
 						}
 					}
 					else{
@@ -536,9 +538,12 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 		int errorPosition = lex.currentPosition;
 		String errorPositionIndicator = "";
 		
-		String errorArea = lex.sourceFile.substring(errorPosition - 30, errorPosition + 30) ;
+		String errorArea = lex.sourceFile.substring(errorPosition - 30 < 0 ? 0 : errorPosition - 30, 
+				errorPosition + 30 <  lex.sourceFile.length() ? errorPosition + 30 : lex.sourceFile.length()) ;
 		
 		String errorMessage = "Syntax Error - " + missingToken.toString() + " was expected and not found.";
+		
+		errorMessage += "\nCurrent Token - " + lex.currenttoken.content;
 		
 		return "\n" + errorArea + "\n" + errorMessage;
 	}
