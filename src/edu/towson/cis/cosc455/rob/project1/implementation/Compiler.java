@@ -24,6 +24,7 @@ public class Compiler {
 	static String invalidTokenError = " is an Invalid Token.";
 	
 	//variables
+	
 	public static boolean endOfFile = false;
 	public static boolean verboseOutput = false;
 	public static Token currentToken = null;

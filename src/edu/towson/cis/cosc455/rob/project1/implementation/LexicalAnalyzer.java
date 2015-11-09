@@ -17,42 +17,48 @@ public class LexicalAnalyzer implements edu.towson.cis.cosc455.rob.project1.inte
 
     /** The current position. */
     int currentPosition;
-    
+    /** The current string. */
     public String lexeme;
-    
+    /** The contents of the markdown sourrce file */
     public String sourceFile;
-    
+    /**Flag for a lexeme that is not valid */
     public boolean unrecognizedToken; 
+    /**Turns debugging information from the compiler on or off*/
     public boolean verboseOutput;
-    
-    
     /** The current index of the TokenBin. */
     int tokenBinIndex = 0;
-    
-    
+    /** The current token*/
     public Token currenttoken;
-    
-    public HashMap<String, Type> markdownTokenHashmap;//use a hashmap instead?
-    
-    public ArrayList<String> definitionList; //stores string definitions of each token
-    
+    /** Holds valid markdown lexemes */
+    public HashMap<String, Type> markdownTokenHashmap;
+    /** Local reference for tokenBin*/
     public static ArrayList<Token> tokenBin;
     
   //String for pattern matching
-  	String wordPatternString = "\\w";	// 	 \\w matches for a word character: [a-zA-Z_0-9]
+    /**\\w matches for a word character: [a-zA-Z_0-9]*/
+  	String wordPatternString = "\\w";
+  	/**w matches for a non-word (but still legal) character: [,.\":?!\u000C/]*/
   	String nonWordPatternString = "[,.\":?!\u000C/]";
+  	/** matches for a whitespace character*/
   	String whitespacePatternString = "[\\s\\e]"; // \\s matches for whitespace characters: [ \t\n\x0B\f\r]
   	
-  //patterns for single numbers, letters and whitespace symbols
+  	
+  	/**patterns for words*/
   	public  Pattern wordPattern;
+  	/**patterns for non words*/
   	public 	Pattern nonWordPattern;
+  	/**patterns for whitespace*/
   	public  Pattern whitespacePattern;
-    
+  	/**Decides whether a string matches a pattern*/
   	public  Matcher matcher;
  
     
+    /**
+     * This constructor analyzes a source file for valid markdown language lexemes
+     * @param sourceFile the markdown sourcefile
+     */
     public LexicalAnalyzer(String sourceFile) {
-    	
+    	/**flag for unrecognized word*/
     	unrecognizedToken = true;
     	verboseOutput = Compiler.verboseOutput;
 		//initialize index values
@@ -63,8 +69,11 @@ public class LexicalAnalyzer implements edu.towson.cis.cosc455.rob.project1.inte
     	nonWordPattern = compilePattern(nonWordPattern, nonWordPatternString);
     	
     	//debug
-    	if(verboseOutput)System.out.println("patterns compiled");
-    	if(verboseOutput)System.out.println(sourceFile);
+    	if(verboseOutput){
+    		System.out.println("patterns compiled");
+    		System.out.println(sourceFile);
+    	}
+    
     	//use local reference for hashMap
     	markdownTokenHashmap = TokenDefinitions.getMarkdownHashmap();
     	
@@ -234,6 +243,11 @@ public class LexicalAnalyzer implements edu.towson.cis.cosc455.rob.project1.inte
 	 * @param c the current character
 	 * @return true, if is space; otherwise false
 	 */
+	/**
+	 * this method tests if the current lexeme contains whitespaces
+	 * @param c current lexeme
+	 * @return true, if it contains valid whitespaces, otherwise false
+	 */
 	public boolean isSpace(String c){
 		
 		if(whitespacePattern == null){
@@ -246,15 +260,27 @@ public class LexicalAnalyzer implements edu.towson.cis.cosc455.rob.project1.inte
 		return matcher.matches();
 	}
 	
+	/**
+	 * this method tests if the current lexeme contains valid words
+	 * @param c current lexeme
+	 * @return true, if it contains valid words, otherwise false
+	 */
 	public boolean isWord(String c){
 		matcher = wordPattern.matcher(c);
 		return matcher.matches();
 	}
-	
+	/**
+	 * this method tests if the current lexeme contains valid non-words
+	 * @param c current lexeme
+	 * @return true, if it contains valid nonwords, otherwise false
+	 */
 	public boolean isNonWord(String c){
 		matcher = nonWordPattern.matcher(c);
 		return matcher.matches();
 	}
+	/**
+	 * This method adds characters to the current lexeme until it reaches a whitespace.
+	 */
 	public void addLetterUntilWhiteSpace(){
 		getCharacter();
 		while(isWord(nextCharacter)){
@@ -296,6 +322,12 @@ public class LexicalAnalyzer implements edu.towson.cis.cosc455.rob.project1.inte
 	
 	
 	
+	/**
+	 * This method compiles a pattern 
+	 * @param p the pattern to be compiled
+	 * @param s the rules that the pattern will use
+	 * @return a compiled pattern
+	 */
 	public Pattern compilePattern(Pattern p, String s){
 		p = Pattern.compile(s);		
 		//test 
@@ -304,18 +336,36 @@ public class LexicalAnalyzer implements edu.towson.cis.cosc455.rob.project1.inte
 		return p;
 	}
 
+	/**
+	 * This method returns the state of the variable "unrecognizedToken"
+	 * @return true, if the token is not recognized, otherwise false
+	 */
 	public boolean isUnrecognizedToken() {
 		return unrecognizedToken;
 	}
-
+	
+	/**
+	 * This method returns the current lexmme
+	 * @return the current lexeme
+	 */
 	public String getLexeme() {
 		return lexeme;
 	}
 	
+	/**
+	 * This method tests to see if the end of the document has been reached
+	 * @return true, if the end of the document has been reached, otherwise false
+	 */
 	public boolean endOfFile() {		
 		return currentPosition >= sourceFile.length();
 	}
 	
+	/**
+	 * This method produces an error message that will provide meaningful information 
+	 * if an exception occurs
+	 * @param erroneousToken the token that caused the error
+	 * @return a string containing a meaningful error message
+	 */
 	public String getLexicalErrorMessage(String erroneousToken){
 		int errorPosition = currentPosition;
 		

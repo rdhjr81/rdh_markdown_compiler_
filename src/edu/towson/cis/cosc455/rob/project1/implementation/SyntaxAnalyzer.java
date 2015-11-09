@@ -19,8 +19,9 @@ import MarkdownTokenDefinitions.TokenDefinitions.Type;
 	listitem	: LISTITEMB (TEXT | varuse)+ LISTITEME ; */
 
 public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.interfaces.SyntaxAnalyzer {
-	
+	/**Flag used by SyntaxAnalyzer to determine if Syntax Error has occurred */
 	public boolean syntaxError;
+	/**Turns debugging information from the compiler on or off*/
 	public boolean verboseOutput;
 	public Token currentToken;
 	public LexicalAnalyzer lex;
