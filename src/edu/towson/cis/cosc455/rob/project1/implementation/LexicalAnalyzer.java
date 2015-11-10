@@ -10,14 +10,19 @@ import MarkdownTokenDefinitions.TokenDefinitions.Type;
 import edu.towson.cis.cosc455.rob.project1.implementation.Token;
 
 
+/**
+ * @author lt
+ *This class tkaes a source file (as a string) and scans each character to determine if it is a valid lexeme 
+ *in the markdown language
+ */
 public class LexicalAnalyzer implements edu.towson.cis.cosc455.rob.project1.interfaces.LexicalAnalyzer {
 
 	 /** The next character. */
     String nextCharacter = "";
 
-    /** The current position. */
+    /** The current position of the lexical analyzer. */
     int currentPosition;
-    /** The current string. */
+    /** The current string being built by the lexical analyzer. */
     public String lexeme;
     /** The contents of the markdown sourrce file */
     public String sourceFile;
@@ -368,8 +373,6 @@ public class LexicalAnalyzer implements edu.towson.cis.cosc455.rob.project1.inte
 	 */
 	public String getLexicalErrorMessage(String erroneousToken){
 		int errorPosition = currentPosition;
-		
-		String errorPositionIndicator = "";
 		
 		String errorArea = sourceFile.substring(errorPosition - 30 < 0 ? 0 : errorPosition - 30, errorPosition + 30) ;
 		

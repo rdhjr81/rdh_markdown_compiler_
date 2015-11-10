@@ -36,10 +36,19 @@ public class SemanticAnalyzer {
 	 */
 	
 	public String translateToHtml(){
+		/**String containing the compiled HTML */
 		String htmlFile = "";
-		
-		boolean headBegin = false, italicsBegin = false, boldBegin = false, newListHasBegun = false, listHasEnded = false,
-				linkBegin = false; 
+		/**Flag indicating whether the first head tag (of the pair of head tags) has been encountered*/
+		boolean headBegin = false;
+		/**Flag indicating whether the first italics tag (of the pair of italics tags) has been encountered*/
+		boolean italicsBegin = false;
+		/**Flag indicating whether the first bold tag (of the pair of bold tags) has been encountered*/
+		boolean boldBegin = false;
+		/**Flag indicating whether a new list element (list element not followed by a previous list element)has been encountered*/
+		boolean newListHasBegun = false; 
+		/**Flag indicating whether a list element not followed by another list element)has been encountered*/
+		boolean listHasEnded = false;
+
 
 		tokenBinIndex = 0;
 		
@@ -168,8 +177,6 @@ public class SemanticAnalyzer {
 	 * @return A correctly formatted HTML iframe segment
 	 */
 	private String convertVideoNodeToHtml(String htmlFile) {
-		// TODO Auto-generated method stub
-		
 		Token t;
 		
 		htmlFile += HtmlDefinitions.HTML_BRACKET_L + HtmlDefinitions.HTML_VIDEO+ " " +
@@ -518,7 +525,7 @@ public class SemanticAnalyzer {
 	 */
 	public void snipVarUsage(int varUseIndex){
 		String before = "", after = "";
-		int count = 0;
+
 		
 		before = printTokenStream();
 		

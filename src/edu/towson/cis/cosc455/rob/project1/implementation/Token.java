@@ -1,6 +1,10 @@
 package edu.towson.cis.cosc455.rob.project1.implementation;
 import MarkdownTokenDefinitions.TokenDefinitions.Type;
 
+/**
+ * @author lt
+ * A class to hold the category and, occasionally content of a particular category of markdown syntax
+ */
 public class Token {
 	
 	
