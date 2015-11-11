@@ -12,8 +12,8 @@ import edu.towson.cis.cosc455.rob.project1.implementation.Token;
 
 /**
  * @author lt
- *This class tkaes a source file (as a string) and scans each character to determine if it is a valid lexeme 
- *in the markdown language
+ *This class takes a source file (as a string) and scans each character to determine if it is a valid lexeme 
+ *in the Markdown language
  */
 public class LexicalAnalyzer implements edu.towson.cis.cosc455.rob.project1.interfaces.LexicalAnalyzer {
 

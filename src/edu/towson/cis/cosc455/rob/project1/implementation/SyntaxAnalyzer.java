@@ -9,10 +9,6 @@ import MarkdownTokenDefinitions.TokenDefinitions.Type;
  *	This class requests a token from the lexical analyzer and determines whether that token is using
  *correct syntax according to the Markdown grammar rules
  */
-/**
- * @author lt
- *
- */
 public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.interfaces.SyntaxAnalyzer {
 	/**Flag used by SyntaxAnalyzer to determine if Syntax Error has occurred */
 	public boolean syntaxError;
@@ -114,7 +110,7 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 	}
 	
 	/**
-	 * This method checks for any annotations inside the document's beginning and ending tags
+	 * This method checks for any markdown tokens inside the document's beginning and ending tags
 	 * @throws CompilerException
 	 */
 	public void code() throws CompilerException {
@@ -568,7 +564,7 @@ public class SyntaxAnalyzer implements edu.towson.cis.cosc455.rob.project1.inter
 	 * @return A string containing relevant information about the syntax error
 	 */
 	public String getSyntaxErrorMessage(Type missingToken){
-		/** Used to store the exact postion of where the exception occurred*/
+		/** Used to store the exact position of where the exception occurred*/
 		int errorPosition = lex.currentPosition;
 		
 		String errorArea = lex.sourceFile.substring(errorPosition - 30 < 0 ? 0 : errorPosition - 30, 
